@@ -1,7 +1,5 @@
 package com.craftinginterpreters.lox;
 
-import com.sun.jdi.PrimitiveValue;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,7 +82,7 @@ public class Scanner {
                     // A comment goes until the end of the line
                     while (peek() != '\n' && !isAtEnd()) advance();
                 }else if (match('*')){
-                    //TODO: Insert code for C-style comment ie /*
+                    while (!endOfCstyleComment() && !isAtEnd()) advance();
                 }else {
                     addToken(SLASH);
                 }
@@ -111,6 +109,14 @@ public class Scanner {
                 }
                 break;
         }
+    }
+
+    private boolean endOfCstyleComment(){
+        if(peek() == '*' && peekNext() =='/'){
+            advanceN(2);// I miss easy use of first-class functions
+            return true;
+        }
+        return false;
     }
 
     private void identifier(){
@@ -189,6 +195,14 @@ public class Scanner {
 
     private char advance(){
         return source.charAt(current++);
+    }
+    private char advanceN(int N){
+        if (N == 1)
+            return advance();
+        for (int i = 0; i < N-1; i++){
+            advance();
+        }
+        return advance();
     }
 
     private void addToken(TokenType type){
