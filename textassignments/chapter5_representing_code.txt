@@ -1,0 +1,11 @@
+expr -> expr "(" parameters ")"
+expr -> expr "." IDENTIFIER
+expr -> IDENTIFIER
+expr -> NUMBER
+
+parameters-> nil
+parameters->  expr 
+parameters->  expr "," expr
+
+The above seems to encode function calls, accessing members of an object using dot notation,
+variables and constant numerical types
