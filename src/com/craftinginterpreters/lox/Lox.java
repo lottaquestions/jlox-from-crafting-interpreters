@@ -8,6 +8,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static com.craftinginterpreters.lox.TokenType.EOF;
+
 public class Lox {
 
     static boolean hadError = false;
@@ -61,5 +63,13 @@ public class Lox {
 
     private static void report (int line, String where, String message){
         System.err.println("[line " + line + "] Error" + where + ": " + message);
+    }
+
+    static void error (Token token, String message){
+        if (token.type == EOF){
+            report (token.line, " at end", message);
+        }else {
+            report (token.line, " at '" + token.lexeme + "'", message);
+        }
     }
 }
