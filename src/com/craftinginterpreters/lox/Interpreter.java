@@ -1,4 +1,5 @@
 package com.craftinginterpreters.lox;
+import java.lang.Math;
 
 public class Interpreter implements  Expr.Visitor<Object>{
     @Override
@@ -37,11 +38,17 @@ public class Interpreter implements  Expr.Visitor<Object>{
                 }
                 //Enable concatenation of a string and a number
                 if (left instanceof String && right instanceof Double){
-                    return (String)left + right.toString();
+                    return (String)left + stringify(right);
+                }
+                if (left instanceof Double && right instanceof String){
+                    return stringify(left) + (String)right ;
                 }
                 throw new RuntimeError(expr.operator,"Operands must be two numbers or two strings");
             case SLASH:
                 checkNumberOperands (expr.operator, left, right);
+                double rightDouble = (double) right;
+                if (Math.abs(rightDouble) < 1e-9)
+                    throw new RuntimeError(expr.operator, "Second operand must not be zero");
                 return (double)left / (double) right;
             case STAR:
                 checkNumberOperands (expr.operator, left, right);
