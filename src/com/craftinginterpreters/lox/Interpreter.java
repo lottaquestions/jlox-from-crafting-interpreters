@@ -1,13 +1,39 @@
 package com.craftinginterpreters.lox;
 import java.lang.Math;
+import java.util.EmptyStackException;
+import java.util.Stack;
 
 public class Interpreter implements  Expr.Visitor<Object>{
+    private  Stack<Boolean> ternaryConditionPredicateResult ;
+    public Interpreter(){
+        ternaryConditionPredicateResult = new Stack<>();
+    }
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
-        Object left = evaluate(expr.left);
-        Object right = evaluate(expr.right);
+        boolean evaluateLeft = true;
+        if (expr.operator.type ==  TokenType.COLON)
+        {
+            try {
+                Boolean isEvaluateLeft = ternaryConditionPredicateResult.pop();
+                evaluateLeft = (boolean) isEvaluateLeft;
+            }catch ( EmptyStackException emptyStackException){
+                throw new RuntimeError(expr.operator, "Missing ? for : in ternary operator");
+            }
+        }
+
+        Object left = (evaluateLeft ? evaluate(expr.left) : null);
+        if (expr.operator.type == TokenType.QUESTION_MARK){
+            ternaryConditionPredicateResult.push((Boolean) left);
+        }
+        boolean evaluateRight = !(evaluateLeft && expr.operator.type ==  TokenType.COLON);
+        Object right = (evaluateRight ? evaluate(expr.right) : null);
 
         switch (expr.operator.type){
+            case COMMA:
+            case QUESTION_MARK:
+                return right;
+            case COLON:
+                return (evaluateLeft ? left : right);
             case GREATER:
                 checkNumberOperands (expr.operator, left, right);
                 return (double)left > (double)right;
@@ -23,7 +49,7 @@ public class Interpreter implements  Expr.Visitor<Object>{
             case BANG_EQUAL:
                 checkNumberOperands (expr.operator, left, right);
                 return !isEqual(left, right);
-            case EQUAL:
+            case EQUAL_EQUAL:
                 checkNumberOperands (expr.operator, left, right);
                 return isEqual(left, right);
             case MINUS:

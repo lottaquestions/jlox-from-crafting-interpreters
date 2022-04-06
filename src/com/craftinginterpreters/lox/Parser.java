@@ -14,10 +14,40 @@ public class Parser {
 
     Expr parse(){
         try{
-            return expression();
+            //return expression();//original. revert here if comma fails
+            return comma();
         }catch (ParseError error){
             return null;
         }
+    }
+
+    private Expr comma(){
+        Expr expr = ternaryCondition();
+        while (match( COMMA)){
+            Token operator = previous();
+            Expr right = ternaryCondition();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+        return expr;
+    }
+
+    private Expr ternaryCondition(){
+        Expr expr = ternaryBranch();
+        while (match(QUESTION_MARK)){
+            Token operator = previous();
+            Expr right = ternaryBranch();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+        return expr;
+    }
+    private Expr ternaryBranch(){
+        Expr expr = expression();
+        if (match(COLON)){
+            Token operator = previous();
+            Expr right = expression();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+        return expr;
     }
 
     private Expr expression(){
