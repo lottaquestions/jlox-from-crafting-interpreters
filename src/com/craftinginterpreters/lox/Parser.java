@@ -14,11 +14,14 @@ public class Parser {
 
     Expr parse(){
         try{
-            //return expression();//original. revert here if comma fails
-            return comma();
+            return expression();
         }catch (ParseError error){
             return null;
         }
+    }
+
+    private Expr expression(){
+        return comma();
     }
 
     private Expr comma(){
@@ -41,18 +44,16 @@ public class Parser {
         return expr;
     }
     private Expr ternaryBranch(){
-        Expr expr = expression();
+        Expr expr = equality();
         if (match(COLON)){
             Token operator = previous();
-            Expr right = expression();
+            Expr right = equality();
             expr = new Expr.Binary(expr, operator, right);
         }
         return expr;
     }
 
-    private Expr expression(){
-        return equality();
-    }
+
 
     private Expr equality(){
         Expr expr = comparison();
