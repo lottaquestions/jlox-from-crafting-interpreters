@@ -27,7 +27,11 @@ public class RPNPrinter implements Expr.Visitor<String>{
         return RPNify(expr.operator.lexeme, expr.right);
     }
 
-    private String RPNify(String name, Expr... exprs){
+    @Override
+    public String  visitVariableExpr(Expr.Variable expr){ return expr.name.toString();}
+
+
+        private String RPNify(String name, Expr... exprs){
         StringBuilder builder = new StringBuilder();
 
         for (Expr expr : exprs){
