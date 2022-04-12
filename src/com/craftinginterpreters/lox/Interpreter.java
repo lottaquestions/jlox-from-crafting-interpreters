@@ -1,13 +1,27 @@
 package com.craftinginterpreters.lox;
 import java.lang.Math;
 import java.util.EmptyStackException;
+import java.util.List;
 import java.util.Stack;
 
-public class Interpreter implements  Expr.Visitor<Object>{
+public class Interpreter implements  Expr.Visitor<Object>, Stmt.Visitor<Void>{
     private  Stack<Boolean> ternaryConditionPredicateResult ;
     public Interpreter(){
         ternaryConditionPredicateResult = new Stack<>();
     }
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt){
+        evaluate(stmt.expression);
+        return null;
+    }
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt){
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+    }
+
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
         boolean evaluateLeft = true;
@@ -147,12 +161,16 @@ public class Interpreter implements  Expr.Visitor<Object>{
         return expr.accept(this);
     }
 
-    void interpret (Expr expression){
+    void interpret (List<Stmt> statements){
         try{
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for(Stmt statement : statements){
+                execute(statement);
+            }
         }catch (RuntimeError error){
             Lox.runtimeError(error);
         }
+    }
+    private void execute(Stmt stmt){
+        stmt.accept(this);
     }
 }
