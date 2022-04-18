@@ -21,7 +21,16 @@ public class Parser {
 
         return statements;
     }
-
+    //TODO: Reinsert the comma operator, when the interpreter is complete
+    private Expr comma(){
+        Expr expr = assignment();
+        while (match( COMMA)){
+            Token operator = previous();
+            Expr right = assignment();
+            expr = new Expr.Binary(expr, operator, right);
+        }
+        return expr;
+    }
     private Stmt declaration (){
         try{
             if (match(VAR)) return varDeclaration();
@@ -44,7 +53,10 @@ public class Parser {
     }
 
     private Stmt statement (){
-        if (match(PRINT)) return printStatement();
+        if (match(PRINT))
+            return printStatement();
+        if (match(LEFT_BRACE))
+            return new Stmt.Block(block());
         return expressionStatement();
     }
 
@@ -60,16 +72,32 @@ public class Parser {
         return new Stmt.Expression(expr);
     }
 
-    private Expr expression(){
-        return comma();
+    private List<Stmt> block (){
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!check(RIGHT_BRACE) && !isAtEnd()){
+            statements.add(declaration());
+        }
+        consume(RIGHT_BRACE, "Expect '}' after block");
+        return statements;
     }
 
-    private Expr comma(){
+    private Expr expression(){
+        return assignment();
+    }
+
+    private Expr assignment(){
         Expr expr = ternaryCondition();
-        while (match( COMMA)){
-            Token operator = previous();
-            Expr right = ternaryCondition();
-            expr = new Expr.Binary(expr, operator, right);
+
+        if (match(EQUAL)){
+            Token equals = previous();
+            Expr value = assignment();
+
+            if (expr instanceof Expr.Variable){
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name,value);
+            }
+            error(equals, "Invalid assignment target");
         }
         return expr;
     }

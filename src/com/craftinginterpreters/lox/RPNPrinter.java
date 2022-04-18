@@ -7,6 +7,11 @@ public class RPNPrinter implements Expr.Visitor<String>{
     }
 
     @Override
+    public String visitAssignExpr(Expr.Assign expr){
+        return expr.value.toString() + " " + expr.name.lexeme.toString() + "=";
+    }
+
+    @Override
     public String visitBinaryExpr(Expr.Binary expr) {
         return RPNify(expr.operator.lexeme, expr.left, expr.right);
     }
