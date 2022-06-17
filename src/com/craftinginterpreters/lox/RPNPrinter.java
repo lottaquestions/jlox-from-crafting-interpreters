@@ -14,7 +14,12 @@ public class RPNPrinter implements Expr.Visitor<String>{
     @Override
     public String visitBinaryExpr(Expr.Binary expr) {
         return RPNify(expr.operator.lexeme, expr.left, expr.right);
+    }@Override
+    public String visitLogicalExpr(Expr.Logical expr) {
+        return RPNify(expr.operator.lexeme, expr.left, expr.right);
     }
+
+
 
     @Override
     public String visitGroupingExpr(Expr.Grouping expr) {
