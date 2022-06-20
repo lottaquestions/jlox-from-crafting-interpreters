@@ -62,6 +62,10 @@ public class Parser {
     }
 
     private Stmt statement (){
+        if (match(FOR))
+            return forStatement();
+        if (match(IF))
+            return ifStatement();
         if (match(PRINT))
             return printStatement();
         if (match(WHILE))
@@ -92,7 +96,7 @@ public class Parser {
         if(!check(RIGHT_PAREN)){
             increment = expression();
         }
-        consume(LEFT_PAREN, "Expect ')' after for clauses.");
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
 
         Stmt body = statement();
 
