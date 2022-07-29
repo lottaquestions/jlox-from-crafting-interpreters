@@ -1,6 +1,8 @@
 package com.craftinginterpreters.lox;
 
 
+import java.util.Stack;
+
 public class RPNPrinter implements Expr.Visitor<String>{
     String print (Expr expr){
         return expr.accept(this);
@@ -14,7 +16,23 @@ public class RPNPrinter implements Expr.Visitor<String>{
     @Override
     public String visitBinaryExpr(Expr.Binary expr) {
         return RPNify(expr.operator.lexeme, expr.left, expr.right);
-    }@Override
+    }
+
+    @Override
+    public String visitCallExpr(Expr.Call expr) {
+        Stack<String> argsStack = new Stack<>();
+
+        for (Expr arg : expr.arguments){
+            argsStack.push(arg.toString());
+        }
+        String args="";
+        while (!argsStack.isEmpty()){
+            args = args + " " + argsStack.pop();
+        }
+        return args + expr.callee.toString();
+    }
+
+    @Override
     public String visitLogicalExpr(Expr.Logical expr) {
         return RPNify(expr.operator.lexeme, expr.left, expr.right);
     }

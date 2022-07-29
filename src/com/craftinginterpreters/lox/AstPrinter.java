@@ -16,6 +16,15 @@ public class AstPrinter implements Expr.Visitor<String>{
     }
 
     @Override
+    public String visitCallExpr(Expr.Call expr) {
+        String args = "";
+        for (Expr arg : expr.arguments){
+            args = args + " " + arg.toString();
+        }
+        return "(" + expr.callee.toString() + "..." + ")";
+    }
+
+    @Override
     public String visitLogicalExpr(Expr.Logical expr) {
         return parenthesize(expr.operator.lexeme, expr.left, expr.right);
     }
