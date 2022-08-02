@@ -21,7 +21,7 @@ public class AstPrinter implements Expr.Visitor<String>{
         for (Expr arg : expr.arguments){
             args = args + " " + arg.toString();
         }
-        return "(" + expr.callee.toString() + "..." + ")";
+        return "(" + expr.callee.toString() + args + ")";
     }
 
     @Override
